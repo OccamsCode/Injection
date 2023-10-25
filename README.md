@@ -24,31 +24,42 @@ or you can add the following dependency to your `Package.swift`:
 
 ### Create The Key
 
+A key is an object which conforms to the `InjectionKey` protocol.
+The protocol contains a single property `currentValue`
+
 ```swift
 struct User {
     var name: String = "Steve Jobs"
 }
 
-private struct UserProviderKey: InjectionKey {
+private struct UserKey: InjectionKey {
     static var currentValue: User = User()
 }
 ```
 
 ### Register Value
 
+To register the value, extend the `InjectedValues` type to define the computed property which will access `InjectedValues` which ultimately stores the value 
+
 ```swift
 extension InjectedValues {
-    var userProvider: User {
-        get { Self[UserProviderKey.self] }
-        set { Self[UserProviderKey.self] = newValue }
+    var user: User {
+        get { Self[UserKey.self] }
+        set { Self[UserKey.self] = newValue }
     }
 }
 ```
 
 ### Usng Injected Value
 
+Create a varible using the `@Injected` property wrapper along with the key path (`\.user`) for the value
+
 ```swift
-final class ViewModel {
-    @Inject(\.userProvider) var user
+struct ViewModel {
+    @Injected(\.user) var user
+    
+    var greeting: String {
+        return "Hello, \(user.name)" // "Hello, Steve Jobs"
+    }
 }
 ```
